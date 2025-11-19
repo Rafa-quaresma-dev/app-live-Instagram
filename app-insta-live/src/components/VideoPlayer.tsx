@@ -31,34 +31,6 @@ const extractYouTubeId = (input: string): string => {
   return input;
 };
 
-// Helper function to resolve profile image path
-const resolveProfileImage = (input: string): string => {
-  if (!input) return "";
-
-  // If it's already a full path (starts with /), return as-is
-  if (input.startsWith("/")) {
-    return input;
-  }
-
-  // If it's just a filename without extension, try common image extensions
-  if (!input.includes(".")) {
-    const extensions = ["jpg", "jpeg", "png", "gif", "webp"];
-    // Return the first valid path (browser will try to load it)
-    // We'll use .jpg as default since it's most common
-    for (const ext of extensions) {
-      const path = `/images/${input}.${ext}`;
-      // In production, we'd check if file exists, but for now return first jpg/png attempt
-      if (ext === "jpg" || ext === "png") {
-        return path;
-      }
-    }
-    return `/images/${input}.jpg`; // Default fallback
-  }
-
-  // If it has extension but no path, prepend /images/
-  return `/images/${input}`;
-};
-
 // Helper function to get CTA button styles
 const getCtaButtonStyles = () => {
   const config = ctaButtonConfig;
@@ -127,44 +99,12 @@ export const VideoPlayer = () => {
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const isInitializing = useRef(false);
 
-  // Auto-detect profile image with any extension
+  // Load profile image
   useEffect(() => {
-    const resolvedPath = resolveProfileImage(channelConfig.profileImageUrl);
-
-    if (!resolvedPath) {
-      setProfileImagePath("");
-      return;
+    // Use the configured URL directly
+    if (channelConfig.profileImageUrl) {
+      setProfileImagePath(channelConfig.profileImageUrl);
     }
-
-    // If it's a full path, use it directly
-    if (resolvedPath.includes(".") && resolvedPath.startsWith("/images/")) {
-      setProfileImagePath(resolvedPath);
-      return;
-    }
-
-    // If it's just a name without extension, try to find the image
-    const tryExtensions = async () => {
-      const baseName = channelConfig.profileImageUrl;
-      const extensions = ["jpg", "jpeg", "png", "gif", "webp"];
-
-      for (const ext of extensions) {
-        const path = `/images/${baseName}.${ext}`;
-        try {
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = path;
-          });
-          setProfileImagePath(path);
-          return;
-        } catch {
-          continue;
-        }
-      }
-    };
-
-    tryExtensions();
   }, []);
 
   useEffect(() => {
