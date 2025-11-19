@@ -95,17 +95,8 @@ export const VideoPlayer = () => {
   const [currentViewers, setCurrentViewers] = useState(videoConfig.viewers.initialCount);
   const [hasDropped, setHasDropped] = useState(false);
   const [showCtaButton, setShowCtaButton] = useState(false);
-  const [profileImagePath, setProfileImagePath] = useState("");
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const isInitializing = useRef(false);
-
-  // Load profile image
-  useEffect(() => {
-    // Use the configured URL directly
-    if (channelConfig.profileImageUrl) {
-      setProfileImagePath(channelConfig.profileImageUrl);
-    }
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -448,9 +439,9 @@ export const VideoPlayer = () => {
             <div className="relative w-10 h-10 flex-shrink-0">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded-full blur-sm opacity-60"></div>
               <div className="relative w-10 h-10 rounded-full border-2 border-white/70 overflow-hidden bg-black">
-                {profileImagePath ? (
+                {channelConfig.profileImageUrl ? (
                   <img
-                    src={profileImagePath}
+                    src={channelConfig.profileImageUrl}
                     alt={channelConfig.name}
                     className="w-full h-full object-cover"
                   />
